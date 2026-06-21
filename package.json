@@ -1,0 +1,9 @@
+{
+  "name": "betarena",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Site de paris esports CS2 gratuit avec systeme de points, donnees HLTV en direct.",
+  "scripts": {
+    "dev": "vercel dev"
+  }
+}

@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BetArena — Paris Esports CS2</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/tabler-icons.min.css">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#08080f;color:#e2e2f0;min-height:100vh;}
+
+    .navbar{background:#0d0d1a;border-bottom:0.5px solid #2a2a40;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:200;}
+    .logo{display:flex;align-items:center;gap:10px;}
+    .logo-icon{width:34px;height:34px;background:#6c4ef2;border-radius:8px;display:flex;align-items:center;justify-content:center;}
+    .logo-icon i{color:#fff;font-size:18px;}
+    .logo-name{font-size:17px;font-weight:600;color:#fff;}
+    .logo-tag{font-size:10px;color:#7c7ca8;display:block;margin-top:-2px;}
+    .nav-points{background:#1a1a2e;border:0.5px solid #3a3a5c;border-radius:8px;padding:6px 14px;display:flex;align-items:center;gap:8px;}
+    .nav-points i{color:#a78bfa;font-size:16px;}
+    .nav-pts-label{font-size:11px;color:#7c7ca8;}
+    .nav-pts-value{font-size:16px;font-weight:600;color:#a78bfa;}
+
+    .container{max-width:1100px;margin:0 auto;padding:1.5rem 1rem;display:grid;grid-template-columns:1fr 320px;gap:1.25rem;}
+
+    .tabs{display:flex;gap:4px;background:#0d0d1a;border:0.5px solid #2a2a40;border-radius:10px;padding:4px;margin-bottom:1rem;}
+    .tab{flex:1;padding:8px;border:none;background:transparent;border-radius:7px;font-size:13px;color:#7c7ca8;cursor:pointer;transition:all .15s;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px;}
+    .tab.active{background:#6c4ef2;color:#fff;font-weight:500;}
+    .tab:hover:not(.active){color:#fff;background:#1a1a2e;}
+    .tab-badge{background:#a78bfa33;color:#a78bfa;font-size:10px;font-weight:600;padding:1px 6px;border-radius:20px;}
+
+    .section-label{font-size:11px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem;display:flex;align-items:center;gap:6px;}
+    .section-title{font-size:11px;font-weight:600;color:#7c7ca8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem;}
+
+    /* FEATURED CARD */
+    .featured-card{background:linear-gradient(135deg,#12103a 0%,#0d0d1a 60%);border:0.5px solid #4a3a8a;border-radius:14px;margin-bottom:.75rem;overflow:hidden;position:relative;}
+    .featured-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#f59e0b,#6c4ef2,#38bdf8);}
+    .match-card{background:#0d0d1a;border:0.5px solid #2a2a40;border-radius:12px;margin-bottom:.75rem;overflow:hidden;transition:border-color .15s;}
+    .match-card:hover{border-color:#3a3a5c;}
+    .match-body{padding:1rem 1.25rem;}
+
+    .match-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;}
+    .game-tag{display:flex;align-items:center;gap:6px;font-size:12px;color:#7c7ca8;flex-wrap:wrap;}
+    .live-badge{display:flex;align-items:center;gap:4px;background:#ef444422;border:0.5px solid #ef444455;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:600;color:#ef4444;}
+    .live-dot{width:5px;height:5px;background:#ef4444;border-radius:50%;animation:pulse 1.5s infinite;}
+    .major-badge{background:#f59e0b22;border:0.5px solid #f59e0b55;border-radius:20px;padding:1px 7px;font-size:10px;color:#f59e0b;font-weight:600;}
+    .match-time{font-size:12px;color:#7c7ca8;}
+    .match-score-live{font-size:12px;color:#a78bfa;font-weight:500;}
+
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+    @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    @keyframes slideIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+    /* TEAMS ROW */
+    .teams-row{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-bottom:.9rem;}
+    .team-side{text-align:center;}
+    .team-logo-box{width:44px;height:44px;border-radius:10px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;letter-spacing:.5px;}
+    .team-name-main{font-size:15px;font-weight:600;color:#e2e2f0;}
+    .team-rank{font-size:10px;color:#7c7ca8;margin-top:2px;}
+    .vs-divider{font-size:11px;color:#3a3a5c;font-weight:700;text-align:center;}
+    .vs-format{font-size:10px;color:#3a3a5c;margin-top:2px;}
+
+    .bet-buttons{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+    .bet-btn{border:0.5px solid #3a3a5c;background:#1a1a2e;border-radius:8px;padding:8px 10px;cursor:pointer;transition:all .15s;font-family:inherit;text-align:left;}
+    .bet-btn:hover{border-color:#6c4ef2;background:#1f1540;}
+    .bet-btn.selected{border-color:#6c4ef2;background:#2d1f6e;}
+    .bet-btn .btn-team{font-size:12px;font-weight:500;color:#e2e2f0;display:block;}
+    .bet-btn .btn-cote{font-size:14px;color:#a78bfa;font-weight:600;display:block;margin-top:2px;}
+
+    /* MATCH INNER TABS */
+    .match-tabs{display:flex;border-top:0.5px solid #2a2a40;}
+    .m-tab{flex:1;padding:7px 4px;border:none;background:transparent;font-size:11px;color:#7c7ca8;cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;}
+    .m-tab.active{color:#a78bfa;border-bottom-color:#6c4ef2;}
+    .m-tab:hover:not(.active){color:#e2e2f0;background:#1a1a2e;}
+
+    /* DETAIL PANEL */
+    .match-detail{padding:.9rem 1.25rem;border-top:0.5px solid #1a1a2e;animation:slideIn .2s ease;display:none;}
+    .match-detail.open{display:block;}
+
+    /* PLAYERS */
+    .team-section-label{font-size:11px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+    .players-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
+    .player-card{background:#111126;border:0.5px solid #2a2a40;border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;}
+    .player-flag{font-size:16px;flex-shrink:0;line-height:1;}
+    .player-info{flex:1;min-width:0;}
+    .player-nick{font-size:12px;font-weight:700;color:#e2e2f0;}
+    .player-real{font-size:10px;color:#7c7ca8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .player-role-tag{font-size:9px;color:#a78bfa;background:#a78bfa22;border-radius:3px;padding:1px 5px;margin-top:2px;display:inline-block;}
+    .player-rating{font-size:14px;font-weight:700;}
+    .r-top{color:#4ade80;} .r-mid{color:#fbbf24;} .r-low{color:#f87171;}
+
+    /* MAPS */
+    .maps-section{}
+    .map-row{display:flex;align-items:center;gap:8px;background:#111126;border-radius:7px;padding:7px 10px;margin-bottom:5px;}
+    .map-thumb{width:32px;height:20px;border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.5px;}
+    .map-name-txt{font-size:12px;font-weight:500;color:#e2e2f0;flex:1;}
+    .map-status-badge{font-size:9px;color:#a78bfa;background:#a78bfa22;border-radius:3px;padding:1px 5px;}
+    .map-score-txt{font-size:13px;font-weight:700;}
+    .ms-current{color:#a78bfa;} .ms-win{color:#4ade80;} .ms-loss{color:#f87171;} .ms-tbd{color:#3a3a5c;}
+
+    /* ODDS TABLE */
+    .odds-tbl{width:100%;font-size:11px;border-collapse:collapse;}
+    .odds-tbl th{color:#7c7ca8;font-weight:500;padding:4px 0;text-align:left;border-bottom:0.5px solid #2a2a40;}
+    .odds-tbl td{padding:5px 0;border-bottom:0.5px solid #1a1a2e;color:#e2e2f0;}
+    .odds-tbl tr:last-child td{border-bottom:none;}
+    .odds-avg{background:#1a1432;}
+    .odds-avg td{color:#a78bfa;font-weight:700;border-top:0.5px solid #3a3a5c!important;}
+
+    /* STATS MINI */
+    .h2h-row{display:flex;gap:6px;margin-top:8px;}
+    .h2h-card{flex:1;background:#111126;border-radius:7px;padding:7px;text-align:center;}
+    .h2h-val{font-size:17px;font-weight:700;}
+    .h2h-lbl{font-size:10px;color:#7c7ca8;margin-top:2px;}
+
+    /* SIDEBAR */
+    .sidebar{position:sticky;top:76px;height:fit-content;}
+    .slip-box{background:#0d0d1a;border:0.5px solid #2a2a40;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem;}
+    .slip-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;}
+    .slip-title{font-size:14px;font-weight:500;color:#e2e2f0;display:flex;align-items:center;gap:6px;}
+    .clear-btn{background:none;border:none;font-size:11px;color:#7c7ca8;cursor:pointer;font-family:inherit;}
+    .clear-btn:hover{color:#ef4444;}
+    .slip-empty{text-align:center;padding:1.5rem 0;font-size:13px;color:#3a3a5c;}
+    .slip-empty i{font-size:32px;display:block;margin:0 auto 8px;opacity:.4;}
+    .slip-item{background:#1a1a2e;border-radius:7px;padding:8px 10px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;}
+    .si-match{font-size:11px;color:#7c7ca8;}
+    .si-pick{font-size:13px;font-weight:500;color:#e2e2f0;margin-top:1px;}
+    .si-right{display:flex;align-items:center;gap:6px;}
+    .si-cote{font-size:13px;color:#a78bfa;font-weight:600;}
+    .remove-btn{background:none;border:none;color:#3a3a5c;cursor:pointer;font-size:15px;padding:0;line-height:1;}
+    .remove-btn:hover{color:#ef4444;}
+    .divider{height:0.5px;background:#2a2a40;margin:.75rem 0;}
+    .wager-label{font-size:11px;color:#7c7ca8;margin-bottom:5px;}
+    .wager-row{display:flex;align-items:center;gap:6px;}
+    .wager-input{flex:1;background:#1a1a2e;border:0.5px solid #3a3a5c;border-radius:7px;padding:7px 10px;color:#e2e2f0;font-size:14px;font-family:inherit;outline:none;}
+    .wager-input:focus{border-color:#6c4ef2;}
+    .wager-pts{font-size:12px;color:#7c7ca8;}
+    .quick-bets{display:flex;gap:4px;margin-top:6px;}
+    .quick-btn{flex:1;background:#1a1a2e;border:0.5px solid #3a3a5c;border-radius:6px;padding:4px;font-size:11px;color:#a78bfa;cursor:pointer;font-family:inherit;font-weight:500;}
+    .quick-btn:hover{background:#2d1f6e;border-color:#6c4ef2;}
+    .potential-row{display:flex;justify-content:space-between;align-items:center;margin-top:.75rem;}
+    .pot-label{font-size:12px;color:#7c7ca8;}
+    .pot-value{font-size:17px;font-weight:600;color:#a78bfa;}
+    .place-btn{width:100%;margin-top:.75rem;background:#6c4ef2;border:none;border-radius:8px;padding:11px;color:#fff;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;transition:background .15s;}
+    .place-btn:hover{background:#7c5ef9;}
+    .place-btn:disabled{background:#2a2a40;color:#7c7ca8;cursor:not-allowed;}
+
+    /* HISTORY */
+    .history-item{background:#0d0d1a;border:0.5px solid #2a2a40;border-radius:12px;padding:.9rem 1.25rem;margin-bottom:.75rem;display:flex;align-items:center;justify-content:space-between;}
+    .hi-match{font-size:12px;color:#7c7ca8;}
+    .hi-pick{font-size:14px;font-weight:500;color:#e2e2f0;margin-top:2px;}
+    .hi-odds{font-size:11px;color:#7c7ca8;margin-top:2px;}
+    .hi-right{text-align:right;}
+    .hi-pts{font-size:14px;font-weight:600;}
+    .hi-status{font-size:11px;margin-top:2px;}
+    .win{color:#4ade80;} .loss{color:#f87171;} .pending-c{color:#a78bfa;}
+
+    .stats-banner{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1rem;}
+    .stat-card{background:#0d0d1a;border:0.5px solid #2a2a40;border-radius:10px;padding:.75rem 1rem;text-align:center;}
+    .stat-value{font-size:20px;font-weight:600;color:#a78bfa;}
+    .stat-label{font-size:11px;color:#7c7ca8;margin-top:2px;}
+
+    .page{display:none;} .page.active{display:block;}
+
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a2e1a;border:0.5px solid #2a6a2a;border-radius:10px;padding:10px 20px;font-size:13px;color:#4ade80;font-weight:500;transition:transform .3s ease;z-index:999;white-space:nowrap;}
+    .toast.show{transform:translateX(-50%) translateY(0);}
+    .toast.error{background:#2e1a1a;border-color:#6a2a2a;color:#f87171;}
+
+    .ranking-box{background:#0d0d1a;border:0.5px solid #2a2a40;border-radius:12px;padding:1rem 1.25rem;}
+    .ranking-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;}
+    .ranking-title{font-size:14px;font-weight:500;color:#e2e2f0;display:flex;align-items:center;gap:6px;}
+    .rank-item{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:0.5px solid #1a1a2e;}
+    .rank-item:last-child{border-bottom:none;}
+    .rank-item.is-me{background:#1f1540;border-radius:8px;padding:7px 8px;margin:0 -8px;border-bottom:none;}
+    .rank-pos{font-size:12px;font-weight:600;color:#7c7ca8;min-width:18px;text-align:center;}
+    .rank-pos.gold{color:#f59e0b;} .rank-pos.silver{color:#94a3b8;} .rank-pos.bronze{color:#b45309;}
+    .rank-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;}
+    .rank-info{flex:1;min-width:0;}
+    .rank-name{font-size:13px;font-weight:500;color:#e2e2f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .rank-pts{font-size:13px;font-weight:600;color:#a78bfa;white-space:nowrap;}
+    .rank-bar-wrap{width:100%;background:#1a1a2e;border-radius:99px;height:3px;margin-top:3px;}
+    .rank-bar{height:3px;border-radius:99px;background:#6c4ef2;transition:width .6s ease;}
+    .add-contact-row{display:flex;gap:6px;margin-top:.75rem;padding-top:.75rem;border-top:0.5px solid #2a2a40;}
+    .add-input{flex:1;background:#1a1a2e;border:0.5px solid #3a3a5c;border-radius:7px;padding:6px 10px;color:#e2e2f0;font-size:12px;font-family:inherit;outline:none;}
+    .add-input:focus{border-color:#6c4ef2;}
+    .add-btn{background:#6c4ef2;border:none;border-radius:7px;padding:6px 10px;color:#fff;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;}
+    .add-btn:hover{background:#7c5ef9;}
+
+    @media(max-width:700px){.container{grid-template-columns:1fr;}.sidebar{position:static;}.players-grid{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="logo">
+    <div class="logo-icon"><i class="ti ti-device-gamepad-2"></i></div>
+    <div><span class="logo-name">BetArena</span><span class="logo-tag">Paris Esports CS2</span></div>
+  </div>
+  <div class="nav-points">
+    <i class="ti ti-coin"></i>
+    <div><div class="nav-pts-label">Mes points</div><div class="nav-pts-value" id="pts-display">1 000</div></div>
+  </div>
+</nav>
+
+<div class="container">
+  <div>
+    <div class="tabs">
+      <button class="tab active" onclick="showPage('matches',this)"><i class="ti ti-sword"></i> Matchs</button>
+      <button class="tab" onclick="showPage('history',this)"><i class="ti ti-clock"></i> Historique</button>
+    </div>
+
+    <div id="page-matches" class="page active">
+      <div class="stats-banner" id="stats-banner"></div>
+
+      <!-- FEATURED -->
+      <div style="margin-bottom:1.25rem;">
+        <div class="section-label"><i class="ti ti-star-filled" style="font-size:12px;"></i> IEM Cologne Major 2026 — Quarts de Finale · $1,250,000</div>
+        <div id="featured-list"></div>
+      </div>
+
+      <!-- OTHERS -->
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;">
+          <div class="section-title" style="margin-bottom:0;"><i class="ti ti-list" style="font-size:12px;vertical-align:-1px;"></i> Autres matchs CS2</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span id="matches-updated" style="font-size:10px;color:#3a3a5c;"></span>
+            <button id="refresh-btn" onclick="fetchOtherMatches()" style="background:#1a1a2e;border:0.5px solid #3a3a5c;border-radius:7px;padding:5px 10px;color:#a78bfa;font-size:12px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;"><i class="ti ti-refresh" style="font-size:13px;"></i> Actualiser</button>
+          </div>
+        </div>
+        <div id="matches-list"></div>
+      </div>
+    </div>
+
+    <div id="page-history" class="page">
+      <div class="section-title">Mes paris</div>
+      <div id="history-list"></div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="slip-box">
+      <div class="slip-header">
+        <div class="slip-title"><i class="ti ti-ticket" style="font-size:16px;"></i> Bulletin <span class="tab-badge" id="slip-badge" style="display:none;">0</span></div>
+        <button class="clear-btn" onclick="clearSlip()">Tout effacer</button>
+      </div>
+      <div id="slip-items"><div class="slip-empty"><i class="ti ti-ticket"></i>Aucune sélection.<br>Choisissez un match !</div></div>
+      <div id="wager-section" style="display:none;">
+        <div class="divider"></div>
+        <div class="wager-label">Mise en points</div>
+        <div class="wager-row"><input type="number" class="wager-input" id="wager" min="10" max="5000" step="10" value="100" oninput="updatePotential()"><span class="wager-pts">pts</span></div>
+        <div class="quick-bets">
+          <button class="quick-btn" onclick="setWager(50)">50</button>
+          <button class="quick-btn" onclick="setWager(100)">100</button>
+          <button class="quick-btn" onclick="setWager(200)">200</button>
+          <button class="quick-btn" onclick="setWager(500)">500</button>
+        </div>
+        <div class="divider"></div>
+        <div class="potential-row"><span class="pot-label">Cote totale</span><span style="font-size:13px;color:#7c7ca8;" id="total-odds">×1.00</span></div>
+        <div class="potential-row"><span class="pot-label">Gain potentiel</span><span class="pot-value" id="potential">—</span></div>
+        <button class="place-btn" id="place-btn" onclick="placeBet()"><i class="ti ti-check"></i> Valider le pari</button>
+      </div>
+    </div>
+
+    <div class="ranking-box" style="margin-bottom:1rem;">
+      <div class="ranking-header">
+        <div class="ranking-title"><i class="ti ti-trophy" style="font-size:16px;color:#f59e0b;"></i> Mes contacts</div>
+        <span style="font-size:11px;color:#7c7ca8;" id="rank-count"></span>
+      </div>
+      <div id="ranking-list"></div>
+      <div class="add-contact-row">
+        <input class="add-input" id="contact-input" type="text" placeholder="Nom du contact..." maxlength="20" onkeydown="if(event.key==='Enter')addContact()">
+        <button class="add-btn" onclick="addContact()"><i class="ti ti-plus" style="font-size:13px;vertical-align:-1px;"></i> Ajouter</button>
+      </div>
+    </div>
+
+    <div class="ranking-box">
+      <div class="ranking-header">
+        <div class="ranking-title"><i class="ti ti-world" style="font-size:16px;color:#38bdf8;"></i> Classement Mondial</div>
+        <span style="font-size:11px;color:#7c7ca8;background:#1a1a2e;border:0.5px solid #3a3a5c;border-radius:20px;padding:2px 8px;">Top 15</span>
+      </div>
+      <div id="world-ranking-list"></div>
+      <div style="margin-top:.75rem;padding-top:.75rem;border-top:0.5px solid #2a2a40;text-align:center;">
+        <span id="my-world-rank" style="font-size:12px;color:#7c7ca8;"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  LIVE HLTV-SOURCED MATCH SYSTEM — refresh every 60s
+// ═══════════════════════════════════════════════════════
+const MAP_COLORS = {
+  Mirage:'#1a2e3a',Inferno:'#3a1a0a',Nuke:'#1a3a1a',Anubis:'#2a2a0a',
+  Dust2:'#2e2a1a',Ancient:'#1a2a1a',Overpass:'#1a1a3a',Vertigo:'#2a1a2a',Cache:'#1a2a2e'
+};
+
+// Fallback initial (affiché le temps du 1er chargement, écrasé par les vraies données HLTV dès que possible)
+const FALLBACK_FEATURED = [
+  {
+    id:1, event:'IEM Cologne Major 2026', stage:'Quarts de Finale', format:'BO3',
+    tier:1, live:false, time:'15h45 CEST',
+    teams:['Team Spirit','G2 Esports'], ranks:['#3 HLTV','#7 HLTV'],
+    logos:['TS','G2'], logoColors:['#1a2a2e','#1a2e1a'],
+    odds:[1.62,2.28],
+    oddsDetail:[
+      {name:'Bet365',odd1:1.60,odd2:2.30},{name:'Unibet',odd1:1.65,odd2:2.25},
+      {name:'Betway',odd1:1.61,odd2:2.27},{name:'1xBet',odd1:1.64,odd2:2.20},{name:'Pinnacle',odd1:1.63,odd2:2.26},
+    ],
+    maps:[{name:'Mirage',s1:null,s2:null,status:'tbd'},{name:'Nuke',s1:null,s2:null,status:'tbd'},{name:'Inferno',s1:null,s2:null,status:'tbd'}],
+    players1:[
+      {nick:'donk',real:'Danil Kryshkovets',role:'Rifler',rating:1.47,flag:'🇷🇺',color:'#2a1a1a'},
+      {nick:'sh1ro',real:'Dmitry Sokolov',role:'AWP',rating:1.21,flag:'🇷🇺',color:'#1a2a2e'},
+      {nick:'magixx',real:'Boris Vorobiev',role:'IGL',rating:1.09,flag:'🇷🇺',color:'#1a2a1a'},
+      {nick:'zont1x',real:'Myroslav Plakhotia',role:'AWP',rating:1.13,flag:'🇺🇦',color:'#1a1a2a'},
+      {nick:'tN1R',real:'Andrey Tatarinovich',role:'Support',rating:1.04,flag:'🇧🇾',color:'#2a2a1a'},
+    ],
+    players2:[
+      {nick:'huNter-',real:'Nemanja Kovač',role:'IGL',rating:1.11,flag:'🇧🇦',color:'#1a2e1a'},
+      {nick:'NertZ',real:'Guy Iluz',role:'Rifler',rating:1.18,flag:'🇮🇱',color:'#2a1a2a'},
+      {nick:'SunPayus',real:'Álvaro García',role:'AWP',rating:1.14,flag:'🇪🇸',color:'#2a2a0a'},
+      {nick:'HeavyGod',real:'Nikita Martynenko',role:'Rifler',rating:1.08,flag:'🇮🇱',color:'#1a1a3a'},
+      {nick:'MATYS',real:'Matúš Šimko',role:'Entry',rating:1.06,flag:'🇸🇰',color:'#2a1a3a'},
+    ],
+    h2h:{wins1:4,wins2:3,label:'Head-to-Head 2025–2026'},
+    hltvUrl:'https://www.hltv.org/matches/2394905/spirit-vs-g2-iem-cologne-major-2026',
+    activeTab:'bet'
+  },
+  {
+    id:2, event:'IEM Cologne Major 2026', stage:'Quarts de Finale', format:'BO3',
+    tier:1, live:false, time:'19h00 CEST',
+    teams:['Team Falcons','Team Vitality'], ranks:['#4 HLTV','#1 HLTV'],
+    logos:['FLC','VIT'], logoColors:['#2a1a0a','#1e1e3a'],
+    odds:[2.45,1.55],
+    oddsDetail:[
+      {name:'Bet365',odd1:2.40,odd2:1.55},{name:'Unibet',odd1:2.50,odd2:1.52},
+      {name:'Betway',odd1:2.45,odd2:1.56},{name:'1xBet',odd1:2.47,odd2:1.54},{name:'Pinnacle',odd1:2.43,odd2:1.57},
+    ],
+    maps:[{name:'Inferno',s1:null,s2:null,status:'tbd'},{name:'Mirage',s1:null,s2:null,status:'tbd'},{name:'Ancient',s1:null,s2:null,status:'tbd'}],
+    players1:[
+      {nick:'NiKo',real:'Nikola Kovač',role:'Rifler',rating:1.24,flag:'🇧🇦',color:'#2a1a1a'},
+      {nick:'m0NESY',real:'Ilya Osipov',role:'AWP',rating:1.29,flag:'🇷🇺',color:'#1a2a1a'},
+      {nick:'karrigan',real:'Finn Andersen',role:'IGL',rating:1.01,flag:'🇩🇰',color:'#1a1a2a'},
+      {nick:'TeSeS',real:'René Madsen',role:'Rifler',rating:1.12,flag:'🇩🇰',color:'#2a2a1a'},
+      {nick:'kyousuke',real:'Maxim Lukin',role:'Support',rating:1.08,flag:'🇷🇺',color:'#1a2a2e'},
+    ],
+    players2:[
+      {nick:'ZywOo',real:'Mathieu Herbaut',role:'AWP',rating:1.38,flag:'🇫🇷',color:'#1e1e3a'},
+      {nick:'ropz',real:'Robin Kool',role:'Rifler',rating:1.22,flag:'🇪🇪',color:'#1a2a2a'},
+      {nick:'flameZ',real:'Shahar Shushan',role:'Entry',rating:1.15,flag:'🇮🇱',color:'#2a1a2a'},
+      {nick:'apEX',real:'Dan Madesclaire',role:'IGL',rating:1.03,flag:'🇫🇷',color:'#2a2a1a'},
+      {nick:'mezii',real:'William Merriman',role:'Support',rating:1.07,flag:'🇬🇧',color:'#1a2a1a'},
+    ],
+    h2h:{wins1:2,wins2:5,label:'Head-to-Head 2025–2026'},
+    hltvUrl:'https://www.hltv.org/matches/2394906/falcons-vs-vitality-iem-cologne-major-2026',
+    activeTab:'bet'
+  }
+];
+
+let FEATURED_MATCHES = FALLBACK_FEATURED.map(m=>({...m}));
+let OTHER_MATCHES = [];
+let matchIdCounter = 1000;
+let selectedBets = {};
+let history = [];
+let totalBets = 0;
+let lastFetchTime = null;
+let isFetchingMatches = false;
+
+// ═══ UTILS ═════════════════════════════════════════════
+function fmt(n){return Math.round(n).toLocaleString('fr-FR');}
+function avgOdds(arr){const p=arr.map(o=>1/o);return parseFloat((1/(p.reduce((a,b)=>a+b,0)/p.length)).toFixed(2));}
+function rClass(r){return r>=1.20?'r-top':r>=1.07?'r-mid':'r-low';}
+
+// ═══ POINTS SYSTEM ════════════════════════════════════
+let userPoints=1000;
+const SK_PTS='betarena_points', SK_DATE='betarena_date';
+function loadPoints(){const s=localStorage.getItem(SK_PTS);if(s!==null)userPoints=parseInt(s);}
+function savePoints(){localStorage.setItem(SK_PTS,userPoints);}
+function updatePointsDisplay(){document.getElementById('pts-display').textContent=fmt(userPoints);}
+function checkDailyRecharge(){
+  const today=new Date().toISOString().slice(0,10);
+  const last=localStorage.getItem(SK_DATE);
+  if(last===today)return;
+  if(userPoints<1000){
+    const before=userPoints;
+    userPoints=Math.min(userPoints+100,1000);
+    savePoints();localStorage.setItem(SK_DATE,today);
+    const gained=userPoints-before;
+    if(gained>0)setTimeout(()=>{showToast(`🎁 Bonus journalier : +${gained} pts !`);updatePointsDisplay();renderStats();syncRankingPoints();},1200);
+  }else{localStorage.setItem(SK_DATE,today);}
+}
+
+// ═══ PAGES ════════════════════════════════════════════
+function showPage(p,btn){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  btn.classList.add('active');
+  if(p==='history')renderHistory();
+}
+
+function renderStats(){
+  const wins=history.filter(h=>h.status==='win').length;
+  document.getElementById('stats-banner').innerHTML=`
+    <div class="stat-card"><div class="stat-value">${fmt(userPoints)}</div><div class="stat-label"><i class="ti ti-coin" style="font-size:12px;vertical-align:-1px;"></i> Points</div></div>
+    <div class="stat-card"><div class="stat-value">${totalBets}</div><div class="stat-label">Paris joués</div></div>
+    <div class="stat-card"><div class="stat-value">${totalBets>0?Math.round(wins/totalBets*100):0}%</div><div class="stat-label">Taux victoire</div></div>`;
+}
+
+// ═══ MATCH RENDERING ══════════════════════════════════
+function buildPlayerCard(p){
+  return `<div class="player-card">
+    <div class="player-flag">${p.flag||'🌍'}</div>
+    <div class="player-info">
+      <div class="player-nick">${p.nick}</div>
+      <div class="player-real">${p.real||''}</div>
+      <span class="player-role-tag">${p.role||'Rifler'}</span>
+    </div>
+    <div class="player-rating ${rClass(p.rating||1.0)}">${(p.rating||1.0).toFixed(2)}</div>
+  </div>`;
+}
+
+function buildPlayersPanel(m){
+  if(!m.players1||!m.players1.length)return `<div style="text-align:center;color:#3a3a5c;font-size:12px;padding:1rem 0;">Roster non disponible pour ce match.</div>`;
+  const avg1=(m.players1.reduce((s,p)=>s+(p.rating||1),0)/m.players1.length).toFixed(2);
+  const avg2=(m.players2.reduce((s,p)=>s+(p.rating||1),0)/m.players2.length).toFixed(2);
+  return `
+    <div class="team-section-label" style="color:#a78bfa;"><i class="ti ti-shield-half-filled"></i>${m.teams[0]} <span style="font-size:10px;color:#7c7ca8;margin-left:4px;">Rating moy. <span class="${rClass(parseFloat(avg1))}">${avg1}</span></span></div>
+    <div class="players-grid">${m.players1.map(buildPlayerCard).join('')}</div>
+    <div style="border-top:0.5px solid #2a2a40;padding-top:10px;margin-top:2px;">
+    <div class="team-section-label" style="color:#38bdf8;"><i class="ti ti-shield-half-filled"></i>${m.teams[1]} <span style="font-size:10px;color:#7c7ca8;margin-left:4px;">Rating moy. <span class="${rClass(parseFloat(avg2))}">${avg2}</span></span></div>
+    <div class="players-grid">${m.players2.map(buildPlayerCard).join('')}</div>
+    </div>
+    <div style="margin-top:6px;background:#111126;border-radius:7px;padding:5px 10px;font-size:10px;color:#3a3a5c;">Ratings HLTV 2.0 · ${m.event||'CS2'}</div>`;
+}
+
+function buildMapsPanel(m){
+  if(!m.maps||!m.maps.length)return `<div style="text-align:center;color:#3a3a5c;font-size:12px;padding:1rem 0;">Maps non disponibles pour ce match.</div>`;
+  const mapRow = mp => {
+    const bg = MAP_COLORS[mp.name]||'#1a1a2a';
+    let scoreHtml='';
+    if(mp.status==='live'){scoreHtml=`<span class="ms-current">${mp.s1} — ${mp.s2}</span> <span class="map-status-badge">En cours</span>`;}
+    else if(mp.status==='done'){const cls=mp.s1>mp.s2?'ms-win':'ms-loss';scoreHtml=`<span class="${cls}">${mp.s1} — ${mp.s2}</span>`;}
+    else{scoreHtml=`<span class="ms-tbd">À jouer</span>`;}
+    return `<div class="map-row">
+      <div class="map-thumb" style="background:${bg};">${mp.name.slice(0,3).toUpperCase()}</div>
+      <div class="map-name-txt">${mp.name}</div>
+      ${scoreHtml}
+    </div>`;
+  };
+  const h2hHtml = m.h2h?`<div class="h2h-row">
+    <div class="h2h-card"><div class="h2h-val" style="color:#a78bfa;">${m.h2h.wins1}</div><div class="h2h-lbl">${m.teams[0]}</div></div>
+    <div class="h2h-card"><div class="h2h-val" style="color:#7c7ca8;font-size:10px;">${m.h2h.label}</div></div>
+    <div class="h2h-card"><div class="h2h-val" style="color:#38bdf8;">${m.h2h.wins2}</div><div class="h2h-lbl">${m.teams[1]}</div></div>
+  </div>`:'';
+  return `<div class="maps-section">${m.maps.map(mapRow).join('')}</div>${h2hHtml}`;
+}
+
+function buildCotesPanel(m){
+  if(!m.oddsDetail)return`<div style="text-align:center;color:#3a3a5c;font-size:12px;padding:1rem 0;"><i class="ti ti-loader-2" style="animation:spin 1s linear infinite;display:block;font-size:22px;margin:0 auto 6px;"></i>Récupération...</div>`;
+  const rows=m.oddsDetail.map(b=>`<tr><td style="color:#7c7ca8;">${b.name}</td><td style="text-align:center;">×${b.odd1}</td><td style="text-align:right;">×${b.odd2}</td></tr>`).join('');
+  const a1=avgOdds(m.oddsDetail.map(b=>b.odd1));
+  const a2=avgOdds(m.oddsDetail.map(b=>b.odd2));
+  return `<table class="odds-tbl">
+    <thead><tr><th>Bookmaker</th><th style="text-align:center;">${m.teams[0]}</th><th style="text-align:right;">${m.teams[1]}</th></tr></thead>
+    <tbody>${rows}<tr class="odds-avg"><td>Moyenne</td><td style="text-align:center;">×${a1}</td><td style="text-align:right;">×${a2}</td></tr></tbody>
+  </table>
+  <div style="margin-top:6px;font-size:10px;color:#3a3a5c;">Moyenne harmonique · ${m.oddsDetail.length} bookmakers</div>`;
+}
+
+function buildDetailPanel(m){
+  if(m.activeTab==='players')return buildPlayersPanel(m);
+  if(m.activeTab==='maps')return buildMapsPanel(m);
+  if(m.activeTab==='cotes')return buildCotesPanel(m);
+  return '';
+}
+
+function buildMatchHTML(m, isFeatured){
+  const s0=selectedBets[m.id]!==undefined&&selectedBets[m.id].team===0;
+  const s1=selectedBets[m.id]!==undefined&&selectedBets[m.id].team===1;
+
+  const teamsHtml=`<div class="teams-row">
+    <div class="team-side">
+      <div class="team-logo-box" style="background:${m.logoColors[0]};color:#e2e2f0;">${m.logos[0]}</div>
+      <div class="team-name-main">${m.teams[0]}</div>
+      <div class="team-rank">${m.ranks?m.ranks[0]:''}</div>
+    </div>
+    <div class="vs-divider">VS<div class="vs-format">${m.format||'BO3'}</div></div>
+    <div class="team-side">
+      <div class="team-logo-box" style="background:${m.logoColors[1]};color:#e2e2f0;">${m.logos[1]}</div>
+      <div class="team-name-main">${m.teams[1]}</div>
+      <div class="team-rank">${m.ranks?m.ranks[1]:''}</div>
+    </div>
+  </div>`;
+
+  const headerHtml=`<div class="match-header">
+    <div class="game-tag">
+      <i class="ti ti-crosshair"></i>
+      <span style="color:#a78bfa;font-weight:500;">CS2</span>
+      <span style="color:#3a3a5c;">·</span>
+      <span>${m.event}</span>
+      ${m.stage?`<span style="color:#3a3a5c;">·</span><span>${m.stage}</span>`:''}
+      ${m.live?`<div class="live-badge"><div class="live-dot"></div>LIVE</div>`:''}
+      ${isFeatured?`<span class="major-badge"><i class="ti ti-star-filled" style="font-size:9px;vertical-align:0;"></i> Major</span>`:''}
+    </div>
+    <div>${m.live&&m.score?`<span class="match-score-live">${m.score}</span>`:`<span class="match-time"><i class="ti ti-clock" style="font-size:11px;vertical-align:-1px;"></i> ${m.time||'À venir'}</span>`}</div>
+  </div>`;
+
+  const betHtml=`<div class="bet-buttons" style="margin-top:8px;">
+    <button class="bet-btn ${s0?'selected':''}" onclick="selectBet(${m.id},0)">
+      <span class="btn-team">${m.teams[0]}</span>
+      <span class="btn-cote">×${m.odds[0]}</span>
+    </button>
+    <button class="bet-btn ${s1?'selected':''}" onclick="selectBet(${m.id},1)">
+      <span class="btn-team">${m.teams[1]}</span>
+      <span class="btn-cote">×${m.odds[1]}</span>
+    </button>
+  </div>`;
+
+  const hasPlayers=m.players1&&m.players1.length>0;
+  const hasMaps=m.maps&&m.maps.length>0;
+
+  const innerTabsHtml=`<div class="match-tabs">
+    <button class="m-tab ${m.activeTab==='bet'?'active':''}" onclick="setMTab(${m.id},'bet',this)"><i class="ti ti-ticket" style="font-size:11px;vertical-align:-1px;"></i> Pari</button>
+    ${hasPlayers?`<button class="m-tab ${m.activeTab==='players'?'active':''}" onclick="setMTab(${m.id},'players',this)"><i class="ti ti-users" style="font-size:11px;vertical-align:-1px;"></i> Joueurs</button>`:''}
+    ${hasMaps?`<button class="m-tab ${m.activeTab==='maps'?'active':''}" onclick="setMTab(${m.id},'maps',this)"><i class="ti ti-map" style="font-size:11px;vertical-align:-1px;"></i> Maps</button>`:''}
+    ${m.oddsDetail?`<button class="m-tab ${m.activeTab==='cotes'?'active':''}" onclick="setMTab(${m.id},'cotes',this)"><i class="ti ti-chart-bar" style="font-size:11px;vertical-align:-1px;"></i> Cotes</button>`:''}
+    ${m.hltvUrl?`<button class="m-tab" onclick="window.open('${m.hltvUrl}','_blank')"><i class="ti ti-external-link" style="font-size:11px;vertical-align:-1px;"></i> HLTV</button>`:''}
+  </div>`;
+
+  const detailHtml=`<div class="match-detail ${m.activeTab!=='bet'?'open':''}" id="detail-${m.id}">${buildDetailPanel(m)}</div>`;
+
+  const body=`<div class="match-body">${headerHtml}${teamsHtml}${betHtml}</div>${innerTabsHtml}${detailHtml}`;
+
+  if(isFeatured)return `<div class="featured-card" id="card-${m.id}">${body}</div>`;
+  return `<div class="match-card" id="card-${m.id}">${body}</div>`;
+}
+
+function renderFeatured(){
+  if(!FEATURED_MATCHES.length){
+    document.getElementById('featured-list').innerHTML=`<div style="font-size:12px;color:#3a3a5c;padding:.5rem 0;">Aucun grand événement en cours actuellement.</div>`;
+    return;
+  }
+  document.getElementById('featured-list').innerHTML=FEATURED_MATCHES.map(m=>buildMatchHTML(m,true)).join('');
+}
+
+function renderOtherMatches(){
+  const el=document.getElementById('matches-list');
+  if(OTHER_MATCHES.length===0){el.innerHTML=`<div style="font-size:12px;color:#3a3a5c;padding:.5rem 0;">Aucun autre match disponible.</div>`;return;}
+  el.innerHTML=OTHER_MATCHES.map(m=>buildMatchHTML(m,false)).join('');
+}
+
+function setMTab(matchId,tab,btnEl){
+  let m=FEATURED_MATCHES.find(x=>x.id===matchId)||OTHER_MATCHES.find(x=>x.id===matchId);
+  if(!m)return;
+  m.activeTab=tab;
+  const card=document.getElementById('card-'+matchId);
+  card.querySelectorAll('.m-tab').forEach(b=>b.classList.remove('active'));
+  btnEl.classList.add('active');
+  const detail=document.getElementById('detail-'+matchId);
+  if(tab==='bet'){detail.classList.remove('open');detail.innerHTML='';}
+  else{detail.classList.add('open');detail.innerHTML=buildDetailPanel(m);}
+}
+
+// ═══ LIVE FETCH — ALL HLTV MATCHES TODAY, REFRESHED EVERY 60s ═══
+async function fetchAllHLTVMatches(isBackgroundRefresh){
+  const btn=document.getElementById('refresh-btn');
+  const el=document.getElementById('matches-list');
+
+  if(isFetchingMatches)return; // évite les appels concurrents
+  isFetchingMatches=true;
+
+  if(btn){btn.disabled=true;btn.innerHTML='<i class="ti ti-loader-2" style="animation:spin 1s linear infinite;font-size:13px;"></i> Actualisation...';}
+  if(!isBackgroundRefresh && OTHER_MATCHES.length===0){
+    el.innerHTML=`<div style="text-align:center;padding:2rem;color:#7c7ca8;font-size:13px;"><i class="ti ti-loader-2" style="font-size:28px;display:block;margin:0 auto 10px;animation:spin 1s linear infinite;"></i>Récupération des matchs HLTV en direct...</div>`;
+  }
+
+  try{
+    // Appel à notre propre backend sécurisé (la clé API reste cachée côté serveur)
+    const r=await fetch("/api/matches");
+    if(!r.ok){
+      const errBody=await r.json().catch(()=>({}));
+      throw new Error(errBody.error||('Erreur serveur '+r.status));
+    }
+    const parsed=await r.json();
+
+    function mapMatch(m, idBase, i, isFeat){
+      const bm=m.bookmakers||[];
+      const o1=bm.length>=2?avgOdds(bm.map(b=>b.odd1)):parseFloat((1.6+Math.random()*0.5).toFixed(2));
+      const o2=bm.length>=2?avgOdds(bm.map(b=>b.odd2)):parseFloat((1.9+Math.random()*0.7).toFixed(2));
+      return {
+        id:idBase+i,
+        event:m.event||'CS2', stage:m.stage||'', format:m.format||'BO3',
+        tier:isFeat?1:2, live:!!m.live, time:m.time||'À venir', score:m.score||null,
+        teams:[m.team1,m.team2],
+        ranks:[m.rank1||'',m.rank2||''],
+        logos:[m.team1.slice(0,3).toUpperCase(),m.team2.slice(0,3).toUpperCase()],
+        logoColors:isFeat?['#1e1e3a','#2a1a0a']:['#1a2a2e','#2a1a2e'],
+        odds:[o1,o2],
+        oddsDetail:bm.length>0?bm:null,
+        maps:(m.maps||[]).map(mp=>typeof mp==='string'?{name:mp,s1:null,s2:null,status:'tbd'}:mp),
+        players1:(m.players1||[]).map((p,j)=>({...p,color:['#1a2a1a','#2a1a1a','#1a1a2a','#2a2a1a','#1a2a2a'][j%5]})),
+        players2:(m.players2||[]).map((p,j)=>({...p,color:['#1a1a2e','#2a1a2e','#1a2a2e','#2a2a1e','#1a1a1e'][j%5]})),
+        h2h:null,
+        hltvUrl:m.hltvUrl||'https://www.hltv.org/matches',
+        activeTab:'bet'
+      };
+    }
+
+    // Préserver l'onglet actif sélectionné par l'utilisateur sur les matchs déjà affichés
+    function preserveActiveTab(newM, oldList){
+      const old=oldList.find(o=>o.teams[0]===newM.teams[0]&&o.teams[1]===newM.teams[1]);
+      if(old)newM.activeTab=old.activeTab;
+      return newM;
+    }
+
+    const newFeatured=(parsed.featured||[]).map((m,i)=>preserveActiveTab(mapMatch(m,1,i,true),FEATURED_MATCHES));
+    const newOther=(parsed.other||[]).map((m,i)=>preserveActiveTab(mapMatch(m,1000,i,false),OTHER_MATCHES));
+
+    FEATURED_MATCHES = newFeatured.length?newFeatured:FEATURED_MATCHES;
+    OTHER_MATCHES = newOther;
+
+    lastFetchTime=new Date();
+    document.getElementById('matches-updated').textContent='HLTV live · '+lastFetchTime.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    renderFeatured();
+    renderOtherMatches();
+
+  }catch(e){
+    if(!isBackgroundRefresh && OTHER_MATCHES.length===0){
+      el.innerHTML=`<div style="text-align:center;padding:2rem;color:#7c7ca8;font-size:13px;"><i class="ti ti-wifi-off" style="font-size:28px;display:block;margin:0 auto 8px;"></i>Impossible de charger les matchs.<br><button onclick="fetchAllHLTVMatches(false)" style="margin-top:10px;background:#6c4ef2;border:none;border-radius:7px;padding:6px 14px;color:#fff;font-size:12px;cursor:pointer;">Réessayer</button></div>`;
+    } else {
+      const badge=document.getElementById('matches-updated');
+      if(badge)badge.innerHTML='<span style="color:#f87171;">⚠ Échec actualisation — dernières données conservées</span>';
+    }
+  }
+  isFetchingMatches=false;
+  if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-refresh" style="font-size:13px;"></i> Actualiser';}
+}
+
+// ═══ BETTING ══════════════════════════════════════════
+function getAllMatches(){return[...FEATURED_MATCHES,...OTHER_MATCHES];}
+
+function selectBet(matchId,teamIdx){
+  const m=getAllMatches().find(x=>x.id===matchId);
+  if(!m)return;
+  if(selectedBets[matchId]!==undefined&&selectedBets[matchId].team===teamIdx)delete selectedBets[matchId];
+  else selectedBets[matchId]={team:teamIdx,match:m};
+  updateSlipCount();renderFeatured();renderOtherMatches();renderSlipSidebar();
+}
+
+function updateSlipCount(){
+  const n=Object.keys(selectedBets).length;
+  const b=document.getElementById('slip-badge');
+  if(n>0){b.textContent=n;b.style.display='inline';}else{b.style.display='none';}
+}
+
+function renderSlipSidebar(){
+  const items=Object.entries(selectedBets);
+  const el=document.getElementById('slip-items'),ws=document.getElementById('wager-section');
+  if(!items.length){el.innerHTML=`<div class="slip-empty"><i class="ti ti-ticket"></i>Aucune sélection.<br>Choisissez un match !</div>`;ws.style.display='none';return;}
+  el.innerHTML=items.map(([mid,b])=>`<div class="slip-item">
+    <div><div class="si-match">${b.match.teams[0]} vs ${b.match.teams[1]}</div><div class="si-pick">${b.match.teams[b.team]}</div></div>
+    <div class="si-right"><span class="si-cote">×${b.match.odds[b.team]}</span><button class="remove-btn" onclick="removeBet(${mid})"><i class="ti ti-x"></i></button></div>
+  </div>`).join('');
+  ws.style.display='block';updatePotential();
+}
+
+function removeBet(mid){delete selectedBets[mid];updateSlipCount();renderFeatured();renderOtherMatches();renderSlipSidebar();}
+function clearSlip(){selectedBets={};updateSlipCount();renderFeatured();renderOtherMatches();renderSlipSidebar();}
+function setWager(v){document.getElementById('wager').value=v;updatePotential();}
+function getTotalOdds(){return Object.values(selectedBets).reduce((acc,b)=>acc*b.match.odds[b.team],1);}
+
+function updatePotential(){
+  const wager=parseInt(document.getElementById('wager').value)||0;
+  const odds=getTotalOdds();
+  document.getElementById('potential').textContent=fmt(Math.round(wager*odds))+' pts';
+  document.getElementById('total-odds').textContent='×'+odds.toFixed(2);
+  document.getElementById('place-btn').disabled=wager<10||wager>userPoints||!Object.keys(selectedBets).length;
+}
+
+function placeBet(){
+  const wager=parseInt(document.getElementById('wager').value)||0;
+  if(wager>userPoints){showToast('Points insuffisants !',true);return;}
+  if(wager<10){showToast('Mise minimum : 10 pts',true);return;}
+  const odds=getTotalOdds(),gain=Math.round(wager*odds);
+  const picks=Object.values(selectedBets).map(b=>b.match.teams[b.team]).join(' + ');
+  const matchNames=Object.values(selectedBets).map(b=>`${b.match.teams[0]} vs ${b.match.teams[1]}`).join(', ');
+  history.unshift({label:picks,matchNames,odds:odds.toFixed(2),wager,gain,status:'pending'});
+  totalBets++;userPoints-=wager;
+  updatePointsDisplay();savePoints();
+  selectedBets={};updateSlipCount();renderFeatured();renderOtherMatches();renderSlipSidebar();renderStats();
+  showToast(`Pari validé ! Mise : ${fmt(wager)} pts`);syncRankingPoints();
+  setTimeout(resolveLastBet,3500);
+}
+
+function resolveLastBet(){
+  if(!history.length||history[0].status!=='pending')return;
+  const b=history[0];
+  const won=Math.random()>0.45;
+  b.status=won?'win':'loss';
+  if(won){userPoints+=b.gain;updatePointsDisplay();savePoints();showToast(`🏆 Gagné ! +${fmt(b.gain)} pts`);}
+  else showToast(`Perdu ! -${fmt(b.wager)} pts`,true);
+  renderStats();syncRankingPoints();
+}
+
+function renderHistory(){
+  const el=document.getElementById('history-list');
+  if(!history.length){el.innerHTML=`<div style="text-align:center;padding:3rem;color:#3a3a5c;font-size:13px;"><i class="ti ti-history" style="font-size:36px;display:block;margin:0 auto 10px;"></i>Aucun pari pour l'instant.</div>`;return;}
+  el.innerHTML=history.map(h=>`<div class="history-item">
+    <div><div class="hi-match">${h.matchNames}</div><div class="hi-pick">${h.label}</div><div class="hi-odds">Cote ×${h.odds} — Mise ${fmt(h.wager)} pts</div></div>
+    <div class="hi-right">
+      <div class="hi-pts ${h.status==='win'?'win':h.status==='loss'?'loss':'pending-c'}">${h.status==='win'?'+'+fmt(h.gain)+' pts':h.status==='loss'?'-'+fmt(h.wager)+' pts':'En attente...'}</div>
+      <div class="hi-status ${h.status==='win'?'win':h.status==='loss'?'loss':'pending-c'}">${h.status==='win'?'✓ Gagné':h.status==='loss'?'✗ Perdu':'⏳ En cours'}</div>
+    </div>
+  </div>`).join('');
+}
+
+function showToast(msg,isError=false){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast'+(isError?' error':'');t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ═══ RANKINGS ═════════════════════════════════════════
+const AV_COLORS=[['#2d1f6e','#a78bfa'],['#1a2e1a','#4ade80'],['#2e1a1a','#f87171'],['#1a2a2e','#38bdf8'],['#2e2a1a','#fbbf24'],['#2e1a2a','#f472b6']];
+let contacts=[{name:'NekoFrag',points:3240,isMe:false},{name:'ShadowPro',points:2810,isMe:false},{name:'Moi',points:1000,isMe:true},{name:'ValoKing',points:870,isMe:false},{name:'CS_Legend',points:650,isMe:false}];
+function getInitials(n){return n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+
+function renderRanking(){
+  const sorted=[...contacts].sort((a,b)=>b.points-a.points);
+  const maxPts=sorted[0]?.points||1;
+  document.getElementById('rank-count').textContent=sorted.length+' joueurs';
+  const pi=i=>i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
+  const pc=i=>i===0?'gold':i===1?'silver':i===2?'bronze':'';
+  document.getElementById('ranking-list').innerHTML=sorted.map((c,i)=>{
+    const col=AV_COLORS[i%AV_COLORS.length];
+    const pct=Math.round(c.points/maxPts*100);
+    return `<div class="rank-item${c.isMe?' is-me':''}">
+      <div class="rank-pos ${pc(i)}">${pi(i)}</div>
+      <div class="rank-avatar" style="background:${col[0]};color:${col[1]};">${getInitials(c.name)}</div>
+      <div class="rank-info"><div class="rank-name">${c.name}${c.isMe?' <span style="font-size:10px;color:#a78bfa;">(moi)</span>':''}</div><div class="rank-bar-wrap"><div class="rank-bar" style="width:${pct}%;"></div></div></div>
+      <div class="rank-pts">${fmt(c.points)}<span style="font-size:10px;color:#7c7ca8;font-weight:400;"> pts</span></div>
+    </div>`;
+  }).join('');
+}
+
+function addContact(){
+  const input=document.getElementById('contact-input');
+  const name=input.value.trim();
+  if(!name)return;
+  if(contacts.find(c=>c.name.toLowerCase()===name.toLowerCase())){showToast('Contact déjà existant !',true);return;}
+  contacts.push({name,points:Math.floor(Math.random()*2500)+200,isMe:false});
+  input.value='';renderRanking();showToast(`${name} ajouté !`);
+}
+
+const W_COLORS=['#f59e0b','#94a3b8','#b45309','#6c4ef2','#38bdf8','#4ade80','#f87171','#f472b6','#a78bfa','#fbbf24'];
+const WORLD_PLAYERS=[
+  {name:'xX_BestBettor_xX',pts:187420,flag:'🇧🇷',streak:14},{name:'NightOwlCS',pts:154300,flag:'🇩🇰',streak:9},
+  {name:'ProfetoGG',pts:141800,flag:'🇦🇷',streak:6},{name:'FragGodPL',pts:128950,flag:'🇵🇱',streak:11},
+  {name:'SniperElite_DE',pts:115700,flag:'🇩🇪',streak:3},{name:'CrazyLuckFR',pts:102400,flag:'🇫🇷',streak:7},
+  {name:'TopFragSE',pts:98600,flag:'🇸🇪',streak:2},{name:'AceHunter_RU',pts:91200,flag:'🇷🇺',streak:5},
+  {name:'BetKingUS',pts:84500,flag:'🇺🇸',streak:0},{name:'KoreaNo1',pts:77300,flag:'🇰🇷',streak:4},
+  {name:'EzFragAU',pts:69800,flag:'🇦🇺',streak:8},{name:'ClanwarPT',pts:61200,flag:'🇵🇹',streak:1},
+  {name:'NLProBetter',pts:54900,flag:'🇳🇱',streak:6},{name:'CanuckCS',pts:48700,flag:'🇨🇦',streak:0},
+  {name:'FlashbangFI',pts:41300,flag:'🇫🇮',streak:3}
+];
+
+function getWorldRank(){return[...WORLD_PLAYERS,{name:'Moi',pts:userPoints,flag:'⭐',isMe:true}].sort((a,b)=>b.pts-a.pts);}
+
+function renderWorldRanking(){
+  const ranked=getWorldRank(),top15=ranked.slice(0,15),maxPts=top15[0]?.pts||1;
+  const medal=i=>i===0?'🥇':i===1?'🥈':i===2?'🥉':`<span style="font-size:11px;color:#7c7ca8;">#${i+1}</span>`;
+  document.getElementById('world-ranking-list').innerHTML=top15.map((p,i)=>{
+    const col=W_COLORS[i%W_COLORS.length],pct=Math.round(p.pts/maxPts*100);
+    const streak=(!p.isMe&&p.streak>0)?`<span style="font-size:10px;color:#4ade80;margin-left:3px;">🔥${p.streak}</span>`:'';
+    return `<div class="rank-item${p.isMe?' is-me':''}">
+      <div class="rank-pos">${medal(i)}</div>
+      <div style="font-size:16px;line-height:1;flex-shrink:0;">${p.flag}</div>
+      <div class="rank-info"><div class="rank-name" style="display:flex;align-items:center;">${p.name}${p.isMe?' <span style="font-size:10px;color:#a78bfa;margin-left:4px;">(moi)</span>':''}${streak}</div><div class="rank-bar-wrap"><div class="rank-bar" style="width:${pct}%;background:${col};"></div></div></div>
+      <div class="rank-pts">${p.pts>=1000?(p.pts/1000).toFixed(1)+'k':fmt(p.pts)}<span style="font-size:10px;color:#7c7ca8;font-weight:400;"> pts</span></div>
+    </div>`;
+  }).join('');
+  updateWorldRankPos();
+}
+
+function updateWorldRankPos(){
+  const ranked=getWorldRank(),myRank=ranked.findIndex(p=>p.isMe)+1,next=ranked[myRank-2];
+  const diff=next?fmt(next.pts-userPoints):null;
+  const el=document.getElementById('my-world-rank');
+  if(el)el.innerHTML=`Votre rang mondial : <strong style="color:#a78bfa;">#${myRank}</strong> / ${ranked.length}`+(diff&&myRank>1?` · <span style="color:#7c7ca8;">-${diff} pts du #${myRank-1}</span>`:'');
+}
+
+function syncRankingPoints(){
+  const me=contacts.find(c=>c.isMe);
+  if(me){me.points=userPoints;renderRanking();}
+  renderWorldRanking();
+}
+
+// ═══ INIT ═════════════════════════════════════════════
+loadPoints();updatePointsDisplay();checkDailyRecharge();
+renderStats();renderFeatured();renderRanking();renderWorldRanking();
+fetchAllHLTVMatches(false);
+
+// Rafraîchissement live toutes les 60 secondes — uniquement si l'onglet est visible
+setInterval(()=>{
+  if(document.visibilityState==='visible'){
+    fetchAllHLTVMatches(true);
+  }
+},60*1000);
+
+// Relance immédiatement un refresh quand l'utilisateur revient sur l'onglet,
+// si plus d'une minute s'est écoulée depuis le dernier fetch
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&lastFetchTime){
+    const elapsed=Date.now()-lastFetchTime.getTime();
+    if(elapsed>60*1000)fetchAllHLTVMatches(true);
+  }
+});
+
+// Le bouton "Actualiser" force toujours un refresh manuel immédiat
+function fetchOtherMatches(){fetchAllHLTVMatches(false);}
+</script>
+</body>
+</html>
