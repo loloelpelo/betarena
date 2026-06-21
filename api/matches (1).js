@@ -2,6 +2,12 @@
 // Cette fonction tourne sur le serveur Vercel, jamais dans le navigateur.
 // La clé API reste donc invisible des visiteurs du site.
 
+// Cache en mémoire partagé entre tous les visiteurs : tant que ce cache est
+// valide, on ne réinterroge PAS l'IA, peu importe combien de personnes
+// ouvrent le site en même temps. C'est ce qui limite vraiment les coûts.
+let cache = { data: null, timestamp: 0 };
+const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes
+
 export default async function handler(req, res) {
   // Autorise les appels venant du site (CORS)
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -14,6 +20,14 @@ export default async function handler(req, res) {
 
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Méthode non autorisée' });
+  }
+
+  // Si le cache est encore valide, on le renvoie directement sans appeler l'IA
+  const now = Date.now();
+  if (cache.data && (now - cache.timestamp) < CACHE_DURATION_MS) {
+    res.setHeader('X-Cache', 'HIT');
+    res.setHeader('X-Cache-Age-Seconds', Math.round((now - cache.timestamp) / 1000));
+    return res.status(200).json(cache.data);
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -100,6 +114,10 @@ Heure actuelle: ${nowFR}`;
     if (!parsed.featured) parsed.featured = [];
     if (!parsed.other) parsed.other = [];
 
+    // Met à jour le cache partagé pour les prochains visiteurs
+    cache = { data: parsed, timestamp: Date.now() };
+
+    res.setHeader('X-Cache', 'MISS');
     return res.status(200).json(parsed);
 
   } catch (err) {

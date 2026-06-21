@@ -801,19 +801,20 @@ loadPoints();updatePointsDisplay();checkDailyRecharge();
 renderStats();renderFeatured();renderRanking();renderWorldRanking();
 fetchAllHLTVMatches(false);
 
-// Rafraîchissement live toutes les 60 secondes — uniquement si l'onglet est visible
+// Rafraîchissement live toutes les 5 minutes — uniquement si l'onglet est visible
+// (aligné avec la durée du cache serveur, donc aucune perte d'actualité réelle)
 setInterval(()=>{
   if(document.visibilityState==='visible'){
     fetchAllHLTVMatches(true);
   }
-},60*1000);
+},5*60*1000);
 
 // Relance immédiatement un refresh quand l'utilisateur revient sur l'onglet,
-// si plus d'une minute s'est écoulée depuis le dernier fetch
+// si plus de 5 minutes se sont écoulées depuis le dernier fetch
 document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='visible'&&lastFetchTime){
     const elapsed=Date.now()-lastFetchTime.getTime();
-    if(elapsed>60*1000)fetchAllHLTVMatches(true);
+    if(elapsed>5*60*1000)fetchAllHLTVMatches(true);
   }
 });
 
